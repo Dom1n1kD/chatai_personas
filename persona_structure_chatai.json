@@ -1,0 +1,18 @@
+{
+  "title": "Title",
+  "subtitle": "Subtitle",
+  "model-name": "AI model name, must be supported by Chat AI",
+  "model": "AI model, must be supported by Chat AI",
+  "temperature": 0.2,
+  "top_p": 0.2,
+  "messages": [
+    {
+      "role": "system",
+      "content": "This is a system prompt."
+    },
+    {
+      "role": "info",
+      "content": "This message is only visible to the user."
+    }
+  ]
+}
