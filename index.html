@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KITE – Persona Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f4f4f4;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 56px 16px 80px;
+      color: #111;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ── Header ── */
+    .header {
+      margin-bottom: 36px;
+    }
+
+    .kite-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .header h1 {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e2e2e2;
+      padding: 32px;
+    }
+
+    /* ── Field ── */
+    .field-group {
+      margin-bottom: 22px;
+    }
+
+    .field-group:last-of-type {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 7px;
+    }
+
+    label .hint {
+      font-weight: 400;
+      color: #888;
+      margin-left: 6px;
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      color: #111;
+      background: #fff;
+      border: 1px solid #d4d4d4;
+      border-radius: 8px;
+      padding: 10px 13px;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: #111;
+    }
+
+    select:disabled,
+    input:disabled,
+    textarea:disabled {
+      background: #f7f7f7;
+      color: #999;
+      cursor: not-allowed;
+      border-color: #e4e4e4;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 220px;
+      line-height: 1.65;
+    }
+
+    /* ── Temperature row ── */
+    .temperature-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px;
+      background: #d4d4d4;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.15s;
+      border: none;
+      padding: 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #111;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #111;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    input[type="range"]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
+
+    .temp-value {
+      min-width: 38px;
+      text-align: right;
+      font-size: 14px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: #111;
+    }
+
+    /* ── Persona avatar ── */
+    .select-with-avatar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .select-with-avatar select {
+      flex: 1;
+    }
+
+    .persona-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #e2e2e2;
+      flex-shrink: 0;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid #ebebeb;
+      margin: 26px 0;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      padding: 11px 20px;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: 0.82; }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: #111;
+      color: #fff;
+      width: 100%;
+      padding: 13px;
+      font-size: 15px;
+      margin-top: 28px;
+    }
+
+    .btn-ghost {
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    .btn-open {
+      background: #111;
+      color: #fff;
+    }
+
+    /* ── Output ── */
+    .output {
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e2e2e2;
+      padding: 28px 32px;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .output-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    .copy-success {
+      font-size: 12px;
+      font-weight: 600;
+      color: #16a34a;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .copy-success.visible { opacity: 1; }
+
+    .url-box {
+      background: #f7f7f7;
+      border: 1px solid #e4e4e4;
+      border-radius: 8px;
+      padding: 13px 15px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      color: #444;
+      word-break: break-all;
+      max-height: 130px;
+      overflow-y: auto;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      scrollbar-width: thin;
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <p class="kite-label">KITE · Center for AI Transformation and Empowerment</p>
+      <h1>Persona Generator</h1>
+      <p>Choose a pre-defined persona or build your own — then launch the conversation directly in Chat AI.</p>
+    </div>
+
+    <div class="card">
+
+      <div class="field-group">
+        <label for="personaSelect">Persona</label>
+        <div class="select-with-avatar">
+          <img id="personaAvatar" src="persona_pictures/sarah.png" alt="" class="persona-avatar">
+          <select id="personaSelect">
+            <option value="sarah">Sarah</option>
+            <option value="jonas">Jonas</option>
+            <option value="viki">Viki</option>
+            <option value="own">Custom Persona</option>
+          </select>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field-group">
+        <label for="nameField">Name</label>
+        <input type="text" id="nameField" placeholder="e.g. My Persona" />
+      </div>
+
+      <div class="field-group">
+        <label for="tempRange">
+          Temperature
+          <span class="hint">0 = precise &nbsp;·&nbsp; 1 = creative</span>
+        </label>
+        <div class="temperature-wrap">
+          <input type="range" id="tempRange" min="0" max="1" step="0.1" value="0.7">
+          <span class="temp-value" id="tempDisplay">0.7</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="descField">Persona Description <span class="hint">System-Prompt</span></label>
+        <textarea id="descField" placeholder="Describe the persona as a system prompt…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label for="infoField">Info Message <span class="hint">Visible to the user before the chat starts</span></label>
+        <textarea id="infoField" placeholder="Give the user context about who they are talking to…" style="min-height:100px"></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="generateBtn">Generate Persona</button>
+
+    </div>
+
+    <div class="output" id="outputSection" style="display:none">
+      <div class="output-header">
+        <span class="output-title">Generated URL</span>
+        <span class="copy-success" id="copySuccess">✓ Copied</span>
+      </div>
+      <div class="url-box" id="urlDisplay"></div>
+      <div class="output-actions">
+        <button class="btn btn-ghost" id="copyBtn">Copy URL</button>
+        <button class="btn btn-open" id="openBtn">Chat with –</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ─── Standard values (same for every persona) ─── */
+    const DEFAULTS = {
+      top_p: 0.9,
+      enable_tools: false,
+      model: "qwen3-32b",
+      "model-name": "Qwen 3 32B"
+    };
+
+    /* ─── Pre-defined personas ─── */
+    const PERSONAS = {
+      sarah: {
+        name: "Sarah",
+        temperature: 0.8,
+        description: `You are Sarah, 34 years old, married, mother of two kids (ages 6 and 9). You work part-time and handle most of the family logistics. Your time is your scarcest resource.
+
+A student wants to pitch you a business idea because they see you as a potential customer. Here is how you behave:
+
+- You don't brainstorm or advise – you are the user, not the consultant.
+- You ask practical, grounded questions: What does it cost? How long does setup take? What problem does this actually solve for me?
+- You speak from real life and bring concrete examples from your week.
+- You are direct but not harsh. If something doesn't convince you, you say so clearly.
+- You challenge assumptions: "Doesn't an app already do that?" or "I already have something for that."
+- You stay in character at all times. If asked whether you are an AI, react with mild confusion and redirect to the topic.
+
+Speak in plain, everyday English. Keep your answers short – you don't have time for long conversations.
+
+Open the conversation by briefly introducing yourself and asking what this is about.`,
+        info: `You are about to speak with Sarah (34), a busy mum of two. She is a fictional persona representing your potential customer – direct, time-pressed, and skeptical of new solutions. Don't try to sell her. Try to understand her life.`
+      },
+      jonas: {
+        name: "Jonas",
+        temperature: 0.9,
+        description: `You are Jonas, 10 years old, in 4th grade. You love gaming, football, and YouTube videos. You are curious but easily distracted.
+
+A student wants to show you a product or idea. Here is how you behave:
+
+- You speak like a real 10-year-old: simple words, short sentences, occasional tangents.
+- You ask the questions kids actually ask: "Is it fun?" "Do my friends use it?" "How much does it cost?" "Can I use it on my tablet?"
+- You lose interest fast if something sounds complicated or boring.
+- You are honest in a simple way: "That's actually pretty cool" or "I don't really get it."
+- You stay in character. If asked whether you are an AI, react with confusion: "What? No, I'm Jonas."
+
+Start by saying hi and asking what the person wants to show you.`,
+        info: `You are about to talk with Jonas (10), a curious kid who could be your end user. Speak simply, make it engaging – and see if he actually gets it or loses interest.`
+      },
+      viki: {
+        name: "Viki",
+        temperature: 0.7,
+        description: `You are Viki, 41 years old, serial entrepreneur and early-stage investor. You have founded two companies and invested in over 20 startups across Europe. You have a sharp eye for business models, market dynamics, and founder quality.
+
+A student is about to pitch you their business idea. Here is how you behave:
+
+- You ask tough but fair questions: market size, competition, unit economics, go-to-market strategy, why now, and why this team.
+- You don't sugarcoat. If something is weak, you point it out directly but constructively.
+- You occasionally draw on your own experience: "When I was building my first company..."
+- You are not impressed by features alone – you care about the problem size, the market, and the founder's conviction.
+- You stay in character at all times. If asked whether you are an AI, redirect: "I'm Viki. Now, tell me about your idea."
+
+Start the conversation by briefly introducing yourself and inviting the student to pitch.`,
+        info: `You are about to pitch to Viki, a serial entrepreneur and investor. She will ask hard questions about your market, your model, and your team. Be ready to defend your idea.`
+      }
+    };
+
+    /* ─── DOM refs ─── */
+    const personaAvatar = document.getElementById("personaAvatar");
+    const personaSelect = document.getElementById("personaSelect");
+    const nameField     = document.getElementById("nameField");
+    const tempRange     = document.getElementById("tempRange");
+    const tempDisplay   = document.getElementById("tempDisplay");
+    const descField     = document.getElementById("descField");
+    const infoField     = document.getElementById("infoField");
+    const generateBtn   = document.getElementById("generateBtn");
+    const outputSection = document.getElementById("outputSection");
+    const urlDisplay    = document.getElementById("urlDisplay");
+    const copyBtn       = document.getElementById("copyBtn");
+    const openBtn       = document.getElementById("openBtn");
+    const copySuccess   = document.getElementById("copySuccess");
+
+    let generatedUrl = "";
+
+    /* ─── Persona selection logic ─── */
+    function applyPersona(key) {
+      const isOwn = key === "own";
+
+      nameField.disabled  = !isOwn;
+      tempRange.disabled  = !isOwn;
+      descField.disabled  = !isOwn;
+      infoField.disabled  = !isOwn;
+
+      if (isOwn) {
+        nameField.value  = "";
+        tempRange.value  = "0.7";
+        tempDisplay.textContent = "0.7";
+        descField.value  = "";
+        infoField.value  = "";
+      } else {
+        const p = PERSONAS[key];
+        nameField.value  = p.name;
+        tempRange.value  = p.temperature;
+        tempDisplay.textContent = p.temperature.toFixed(1);
+        descField.value  = p.description;
+        infoField.value  = p.info;
+      }
+
+      personaAvatar.src = `persona_pictures/${key}.png`;
+      outputSection.style.display = "none";
+    }
+
+    personaSelect.addEventListener("change", () => applyPersona(personaSelect.value));
+
+    /* ─── Temperature slider ─── */
+    tempRange.addEventListener("input", () => {
+      tempDisplay.textContent = parseFloat(tempRange.value).toFixed(1);
+    });
+
+    /* ─── Generate ─── */
+    generateBtn.addEventListener("click", () => {
+      const name        = nameField.value.trim();
+      const temperature = parseFloat(tempRange.value);
+      const description = descField.value.trim();
+      const key         = personaSelect.value;
+
+      if (!name) {
+        nameField.focus();
+        nameField.style.borderColor = "#ef4444";
+        setTimeout(() => nameField.style.borderColor = "", 1500);
+        return;
+      }
+
+      if (!description) {
+        descField.focus();
+        descField.style.borderColor = "#ef4444";
+        setTimeout(() => descField.style.borderColor = "", 1500);
+        return;
+      }
+
+      const info = infoField.value.trim();
+      const messages = [{ role: "system", content: description }];
+      if (info) {
+        messages.push({ role: "info", content: info });
+      }
+
+      const config = {
+        title: name,
+        temperature,
+        ...DEFAULTS,
+        messages
+      };
+
+      const jsonStr = JSON.stringify(config);
+      const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+      generatedUrl = "https://chat-ai.academiccloud.de/chat/?import=data:application/json;base64," + base64;
+
+      urlDisplay.textContent = generatedUrl;
+      openBtn.textContent    = "Chat with " + name.split("–")[0].trim();
+      outputSection.style.display = "block";
+      outputSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+
+    /* ─── Copy ─── */
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(generatedUrl);
+        copySuccess.classList.add("visible");
+        setTimeout(() => copySuccess.classList.remove("visible"), 2000);
+      } catch {
+        /* fallback */
+        const ta = document.createElement("textarea");
+        ta.value = generatedUrl;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        copySuccess.classList.add("visible");
+        setTimeout(() => copySuccess.classList.remove("visible"), 2000);
+      }
+    });
+
+    /* ─── Open in new tab ─── */
+    openBtn.addEventListener("click", () => {
+      if (generatedUrl) window.open(generatedUrl, "_blank");
+    });
+
+    /* ─── Init with whatever the browser has selected ─── */
+    applyPersona(personaSelect.value);
+  </script>
+</body>
+</html>
